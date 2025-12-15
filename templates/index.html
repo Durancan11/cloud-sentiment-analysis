@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duran Can Demirezen | Bilişim Sistemleri Müh.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0b0f19;
+            background-image: radial-gradient(circle at 50% 0%, #1a237e 0%, #0b0f19 80%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glass Panel */
+        .glass-panel {
+            background: rgba(17, 25, 40, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* NAVBAR (KİMLİK KARTI STİLİ) */
+        .navbar-custom {
+            background: rgba(11, 15, 25, 0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .student-badge {
+            text-align: right;
+            border-left: 2px solid rgba(255,255,255,0.1);
+            padding-left: 15px;
+        }
+
+        .project-title {
+            background: -webkit-linear-gradient(0deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* İSTATİSTİK KARTLARI */
+        .stat-card-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+        
+        .pulse-circle {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        /* INPUT ALANI */
+        .input-glow {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+        .input-glow:focus {
+            background: rgba(0,0,0,0.5);
+            border-color: #6366f1;
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+
+        /* BUTON */
+        .btn-analyze {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            border: none;
+            color: white;
+            padding: 0 40px;
+            border-radius: 15px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        }
+        .btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5); color: white;}
+
+        /* TABLO */
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .table-custom thead th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; border: none; padding-bottom: 10px; }
+        .table-custom tbody tr { background: rgba(255, 255, 255, 0.03); transition: 0.2s; }
+        .table-custom tbody tr:hover { background: rgba(255, 255, 255, 0.06); transform: scale(1.005); }
+        .table-custom td { padding: 15px; vertical-align: middle; border: none; color: #e2e8f0; }
+        .table-custom td:first-child { border-radius: 12px 0 0 12px; }
+        .table-custom td:last-child { border-radius: 0 12px 12px 0; }
+
+        /* ROZETLER */
+        .badge-status { padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .status-pos { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-neg { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .status-neu { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+        footer { margin-top: auto; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: #64748b; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-white bg-opacity-10 rounded-3 p-2 text-white d-flex align-items-center justify-content-center" style="width:45px; height:45px;">
+                    <i class="fas fa-cloud-bolt fa-lg text-info"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 project-title">BULUT TABANLI</h5>
+                    <div class="text-white-50" style="font-size: 0.9rem;">Duygu Analizi Platformu</div>
+                </div>
+            </div>
+
+            <div class="d-none d-md-flex align-items-center gap-3">
+                <div class="student-badge">
+                    <div class="fw-bold text-white">Duran Can Demirezen</div>
+                    <div class="text-info small font-monospace">211307037</div>
+                </div>
+                <div class="text-end small text-white-50" style="font-size: 0.8rem; line-height: 1.3;">
+                    <div>Bilişim Sistemleri Mühendisliği</div>
+                    <div>Teknoloji Fakültesi</div>
+                </div>
+            </div>
+            
+            <div class="d-md-none text-end">
+                <div class="fw-bold small">D. Can Demirezen</div>
+                <div class="text-info x-small">211307037</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                
+                <div class="stat-card-gradient mb-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1 opacity-75 fw-bold text-uppercase">Toplam İşlem</h6>
+                        <h1 class="display-4 fw-black mb-0">{{ p + n + nt }}</h1>
+                        <span class="badge bg-white bg-opacity-20 mt-2">BERT Model v8.2</span>
+                    </div>
+                    <div class="pulse-circle">
+                        <i class="fas fa-server"></i>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 mb-4">
+                    <h6 class="text-white-50 text-center mb-3 small fw-bold">DUYGU DAĞILIMI</h6>
+                    <div style="height: 180px; position: relative;">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4">
+                    <h6 class="text-white-50 text-center mb-3 small fw-bold">KELİME ANALİZİ</h6>
+                    <canvas id="wordCloudCanvas" width="300" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                
+                <div class="glass-panel p-4 mb-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <i class="fas fa-robot fa-lg text-primary me-3"></i>
+                        <h5 class="fw-bold mb-0 text-white">Yapay Zeka Analizi</h5>
+                    </div>
+                    
+                    <form method="POST" class="d-flex gap-3">
+                        <input type="text" name="metin" class="form-control input-glow" placeholder="Analiz edilecek metni buraya giriniz..." required autocomplete="off">
+                        <button type="submit" class="btn btn-analyze">
+                            ANALİZ ET
+                        </button>
+                    </form>
+
+                    {% if sonuc %}
+                    <div class="mt-4 p-4 rounded-4 animate__animated animate__fadeInUp" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <span class="badge {{ 'bg-success' if renk == 'success' else 'bg-danger' if renk == 'danger' else 'bg-primary' }} mb-2">SONUÇ</span>
+                                <h2 class="fw-bold text-white mb-1">{{ sonuc }}</h2>
+                                <p class="text-white-50 mb-0 fst-italic small">"{{ gecmis[0][0].split('(')[0] }}"</p>
+                            </div>
+                            <div class="col-md-4 text-end border-start border-secondary border-opacity-25">
+                                <div class="display-6 fw-bold text-{{ renk }}">%{{ guven }}</div>
+                                <small class="text-white-50">AI Güven Skoru</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0 text-white small text-uppercase"><i class="fas fa-list-ul me-2 text-info"></i>Son Analiz Kayıtları</h6>
+                        <a href="/indir" class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size: 0.75rem;">Excel İndir</a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Saat</th>
+                                    <th>Metin (Özet)</th>
+                                    <th>Durum</th>
+                                    <th class="text-end">Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for kayit in gecmis %}
+                                <tr>
+                                    <td class="font-monospace text-secondary">{{ kayit[4] }}</td>
+                                    <td>{{ kayit[0][:40] }}...</td>
+                                    <td>
+                                        {% if kayit[1] == 'Pozitif' %} <span class="badge-status status-pos"><i class="fas fa-check-circle me-1"></i>Pozitif</span>
+                                        {% elif kayit[1] == 'Negatif' %} <span class="badge-status status-neg"><i class="fas fa-exclamation-circle me-1"></i>Negatif</span>
+                                        {% else %} <span class="badge-status status-neu">Nötr</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end font-monospace {{ 'text-success' if kayit[3] > 0 else 'text-danger' if kayit[3] < 0 else 'text-info' }}">{{ "%.2f"|format(kayit[3]) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div>&copy; 2025 <strong>Duran Can Demirezen</strong> - Tüm Hakları Saklıdır.</div>
+            <div class="small opacity-50 mt-1">Bulut Bilişim Dersi Final Projesi | Kocaeli Üniversitesi</div>
+        </div>
+    </footer>
+
+    <script>
+        // Chart.js
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pozitif', 'Negatif', 'Nötr'],
+                datasets: [{
+                    data: [{{ p }}, {{ n }}, {{ nt }}],
+                    backgroundColor: ['#10b981', '#ef4444', '#3b82f6'],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                cutout: '75%',
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Word Cloud
+        const list = [{% for kelime, sayi in kelimeler %}['{{ kelime }}', {{ sayi }} * 12 + 10], {% endfor %}];
+        if(list.length > 0) {
+            WordCloud(document.getElementById('wordCloudCanvas'), { 
+                list: list, 
+                gridSize: 12, 
+                weightFactor: 1.2, 
+                fontFamily: 'Outfit', 
+                color: 'random-light', 
+                backgroundColor: 'transparent',
+                rotateRatio: 0 
+            });
+        }
+    </script>
+</body>
+</html>
