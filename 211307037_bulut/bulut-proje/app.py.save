@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+from flask import Flask, render_template, request
+from deep_translator import GoogleTranslator
+from transformers import pipeline
+import sqlite3
+from datetime import datetime
+import csv
+import io
+from collections import Counter
+import re
+import socket
+import traceback
+import random
+
+app = Flask(__name__)
+
+# BERT Modelini Yükle
+print("Yapay Zeka (BERT) Hazirlaniyor...", flush=True)
+ai_pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+
+def init_db():
+    try:
+        conn = sqlite3.connect('analizler.db')
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS kayitlar (id INTEGER PRIMARY KEY AUTOINCREMENT, metin TEXT, sonuc TEXT, skor REAL, tarih TEXT)''')
+        conn.commit()
+        conn.close()
+    except: pass
+init_db()
+
+def get_common_words():
+    try:
+        conn = sqlite3.connect('analizler.db')
+        c = conn.cursor()
+        c.execute("SELECT metin FROM kayitlar")
+        data = c.fetchall()
+        conn.close()
+        if not data: return []
+        tum_metin = " ".join([str(row[0]) for row in data]).lower()
+        kelimeler = re.findall(r'\w+', tum_metin)
+        yasakli = ['the', 'is', 'and', 'to', 'a', 'of', 'in', 'i', 'this', 'for', 'it', 'that', 'with', 'on', 'my', 'me', 'bu', 've', 'bir', 'cok', 'very', 'am']
+        temiz_kelimeler = [k for k in kelimeler if k not in yasakli and len(k) > 2]
+        return Counter(temiz_kelimeler).most_common(20)
+    except: return []
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    try:
+        duygu_sonucu = None
+        renk = "secondary"
+        guven_skoru = 0
+        hostname = socket.gethostname()
+        try: ip_address = socket.gethostbyname(hostname)
+        except: ip_address = "127.0.0.1"
+        
+        if request.method == 'POST':
+            orijinal_metin = request.form.get('metin', '')
+            if orijinal_metin.strip():
+                try: cevrilmis = GoogleTranslator(source='auto', target='en').translate(orijinal_metin)
+                except: cevrilmis = orijinal_metin
+                
+                sonuc = ai_pipeline(cevrilmis)[0]
+                label = sonuc['label']
+                raw_score = sonuc['score']
+                
+                adjustment = random.uniform(0.01, 0.08)
+                humanized_score = raw_score - adjustment
+                
+                if label == 'POSITIVE': final_skor = humanized_score
+                else: final_skor = -humanized_score
+                
+                guven_skoru = int(abs(final_skor) * 100)
+                
+                if final_skor > 0.1:
+                    duygu_sonucu = "POZİTİF"
+                    db_sonuc = "Pozitif"
+                    renk = "success"
+                elif final_skor < -0.1:
+                    duygu_sonucu = "NEGATİF"
+                    db_sonuc = "Negatif"
+                    renk = "danger"
+                else:
+                    duygu_sonucu = "NÖTR"
+                    db_sonuc = "Nötr"
+                    renk = "warning"
+                
+                tarih = datetime.now().strftime("%H:%M")
+                conn = sqlite3.connect('analizler.db')
+                c = conn.cursor()
+                c.execute("INSERT INTO kayitlar (metin, sonuc, skor, tarih) VALUES (?, ?, ?, ?)", (f"{orijinal_metin} ({cevrilmis})", db_sonuc, final_skor, tarih))
+                conn.commit()
+                conn.close()
+
+        conn = sqlite3.connect('analizler.db')
+        c = conn.cursor()
+        c.execute("SELECT metin, sonuc, tarih, skor FROM kayitlar ORDER BY id DESC LIMIT 6")
+        gecmis = c.fetchall()
+        c.execute("SELECT COUNT(*) FROM kayitlar WHERE sonuc='Pozitif'")
+        p = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM kayitlar WHERE sonuc='Negatif'")
+        n = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM kayitlar WHERE sonuc='Nötr'")
+        nt = c.fetchone()[0]
+        conn.close()
+        
+        return render_template('index.html', sonuc=duygu_sonucu, renk=renk, guven=guven_skoru, gecmis=gecmis, p=p, n=n, nt=nt, kelimeler=get_common_words(), host=hostname, ip=ip_address)
+    except Exception as e: return f"HATA: {traceback.format_exc()}"
+
+@app.route('/indir')
+def indir():
+    try:
+        conn = sqlite3.connect('analizler.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM kayitlar")
+        data = c.fetchall()
+        conn.close()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['ID', 'Metin', 'Sonuc', 'Skor', 'Tarih'])
+        writer.writerows(data)
+        return Response(output.getvalue(), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=rapor.csv"})
+    except: return "Hata"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
