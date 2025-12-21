@@ -1,60 +1,57 @@
-☁️ Bulut Tabanlı Duygu Analizi Platformu (Cloud-Based Sentiment Analysis)
-Ders: Bulut Bilişim ve Sanallaştırma | Platform: Google Cloud Platform (GCP) | Durum: Yayında 🟢
+# ☁️ Bulut Tabanlı Duygu Analizi Platformu (Cloud-Based Sentiment Analysis)
 
-📖 Proje Özeti
-Bu proje, Kocaeli Üniversitesi Bilgisayar Mühendisliği Bölümü, "Bulut Bilişim ve Sanallaştırma" dersi kapsamında geliştirilmiştir. Projenin temel amacı, yerel kaynakları tüketmek yerine bulut altyapısı üzerinde çalışan, ölçeklenebilir ve platform bağımsız bir Yapay Zeka (AI) servisi oluşturmaktır.
+> **Ders:** Bulut Bilişim ve Sanallaştırma  
+> **Platform:** Google Cloud Platform (GCP)  
+> **Durum:** Yayında 🟢  
 
-Proje, kullanıcıdan alınan metin verilerini Google Cloud Compute Engine üzerinde barındırılan sanal bir sunucuya iletir. Sunucu tarafında çalışan Python tabanlı doğal dil işleme (NLP) algoritmaları, metnin duygu durumunu (Pozitif/Negatif) ve şiddetini analiz ederek milisaniyeler içinde istemciye yanıt döner.
+## 📖 Proje Özeti
+Bu proje, **Kocaeli Üniversitesi** Bilgisayar Mühendisliği Bölümü, "Bulut Bilişim ve Sanallaştırma" dersi kapsamında geliştirilmiştir. Projenin temel amacı, yerel kaynakları tüketmek yerine bulut altyapısı üzerinde çalışan, **ölçeklenebilir** ve **platform bağımsız** bir Yapay Zeka (AI) servisi oluşturmaktır.
 
-🏗️ Sistem Mimarisi ve Çalışma Mantığı
-Proje, klasik İstemci-Sunucu (Client-Server) mimarisine dayanmaktadır ve sanallaştırma teknolojileri üzerine inşa edilmiştir.
+Proje, kullanıcıdan alınan metin verilerini **Google Cloud Compute Engine** üzerinde barındırılan sanal bir sunucuya iletir. Sunucu tarafında çalışan Python tabanlı doğal dil işleme (NLP) algoritmaları, metnin duygu durumunu (Pozitif/Negatif) ve şiddetini analiz ederek anlık yanıt döner.
 
-İstemci (Client): Kullanıcı, web arayüzü üzerinden metni girer. JavaScript (AJAX), bu veriyi JSON formatında paketler.
+---
 
-Ağ (Network): Veri, HTTP protokolü üzerinden Google Cloud veri merkezindeki (us-central1) sunucunun statik IP adresine iletilir.
+## 🏗️ Sistem Mimarisi ve Çalışma Mantığı
+Proje, klasik **İstemci-Sunucu (Client-Server)** mimarisine dayanmaktadır.
 
-Sunucu (Cloud VM): Ubuntu işletim sistemi üzerinde çalışan Flask servisi, gelen isteği karşılar.
+1.  **İstemci (Client):** Kullanıcı web arayüzü üzerinden metni girer. JavaScript (AJAX) bu veriyi paketler.
+2.  **Ağ (Network):** Veri, HTTP protokolü üzerinden Google Cloud veri merkezindeki sunucunun statik IP adresine iletilir.
+3.  **Sunucu (Cloud VM):** Ubuntu işletim sistemi üzerinde çalışan Flask servisi isteği karşılar.
+4.  **İşlem (Processing):** NLP motoru metni analiz eder, 0 ile 1 arasında bir **Polarite Skoru** üretir.
+5.  **Kalıcılık:** Sonuçlar veritabanına kaydedilir ve geçmiş analiz tablosunda listelenir.
 
-İşlem (Processing): NLP motoru metni analiz eder, 0 ile 1 arasında bir Polarite Skoru üretir.
+---
 
-Veri Kalıcılığı: Analiz sonuçları, tarihçe takibi için veritabanına kaydedilir.
+## 🛠️ Kullanılan Teknolojiler
 
-🛠️ Kullanılan Teknolojiler ve Araçlar
-☁️ Bulut ve Altyapı (Infrastructure)
-Google Cloud Platform (GCP): Projenin ana barındırma sağlayıcısı.
+### ☁️ Bulut ve Altyapı (Infrastructure)
+* **Google Cloud Platform (GCP):** Projenin ana barındırma sağlayıcısı.
+* **Compute Engine (VM):** Uygulamanın üzerinde koştuğu sanal makine (Ubuntu Linux).
+* **Docker:** Uygulama izolasyonu ve konteynerizasyon.
 
-Compute Engine (VM): Uygulamanın üzerinde koştuğu sanal makine servisi.
+### ⚙️ Backend (Arka Uç)
+* **Python 3.x:** Ana programlama dili.
+* **Flask:** Hafif (lightweight) ve hızlı Web Framework.
+* **TextBlob / NLTK:** Duygu analizi yapan NLP kütüphaneleri.
 
-Ubuntu Server (Linux): Kararlılık ve performans için tercih edilen sunucu işletim sistemi.
+### 🎨 Frontend (Ön Yüz)
+* **HTML5 & CSS3:** Modern ve responsive tasarım.
+* **JavaScript (ES6):** Asenkron veri iletişimi ve DOM manipülasyonu.
+* **Jinja2:** Python verilerini HTML şablonuna gömmek için kullanılan motor.
 
-Docker: Uygulamanın bağımlılıklarını izole etmek ve "her yerde çalışabilir" (containerization) hale getirmek için kullanıldı.
+---
 
-⚙️ Backend (Arka Uç)
-Python 3.x: Ana programlama dili.
+## 🚀 Temel Özellikler
+* ✅ **Gerçek Zamanlı Analiz:** Girilen metni anlık olarak işleyip sonucu gösterir.
+* 📊 **Skorlama Algoritması:** Sadece "İyi/Kötü" demez; duygunun şiddetini (Örn: 0.95 - Çok Güçlü Pozitif) sayısal olarak verir.
+* 📝 **Geçmiş Kayıtlar:** Yapılan son analizleri hafızada tutarak liste halinde sunar.
+* 🌍 **Uzaktan Erişim:** Bulut tabanlı olduğu için internete bağlı her cihazdan erişilebilir.
 
-Flask: Hafif (lightweight) ve hızlı olduğu için tercih edilen Web Framework.
+---
 
-TextBlob / NLTK: Metin madenciliği ve duygu analizi yapan NLP kütüphaneleri.
+## 📂 Proje Dizin Yapısı
 
-🎨 Frontend (Ön Yüz)
-HTML5 & CSS3: Modern ve responsive (mobil uyumlu) tasarım.
-
-JavaScript (ES6): Asenkron veri iletişimi ve DOM manipülasyonu.
-
-Jinja2: Python verilerini HTML şablonuna dinamik olarak gömmek için kullanılan motor.
-
-🚀 Temel Özellikler
-✅ Gerçek Zamanlı Analiz: Girilen metni anlık olarak işleyip sonucu gösterir.
-
-📊 Skorlama Algoritması: Sadece "İyi/Kötü" demez; duygunun şiddetini (Örn: 0.95 - Çok Güçlü Pozitif) sayısal olarak verir.
-
-📝 Geçmiş Kayıtlar: Yapılan son analizleri hafızada tutarak liste halinde sunar.
-
-🌍 Uzaktan Erişim: Bulut tabanlı olduğu için internete bağlı her cihazdan erişilebilir.
-
-📂 Proje Dizin Yapısı
-Plaintext
-
+```text
 cloud-sentiment-analysis/
 ├── app.py                # Ana Flask uygulaması ve backend kodları
 ├── Dockerfile            # Konteynerizasyon ayarları
