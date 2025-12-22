@@ -27,7 +27,6 @@ Proje, klasik **İstemci-Sunucu (Client-Server)** mimarisine dayanmaktadır.
 ### ☁️ Bulut ve Altyapı (Infrastructure)
 * **Google Cloud Platform (GCP):** Projenin ana barındırma sağlayıcısı.
 * **Compute Engine (VM):** Uygulamanın üzerinde koştuğu sanal makine (Ubuntu Linux).
-* **Docker:** Uygulama izolasyonu ve konteynerizasyon.
 
 ### ⚙️ Backend (Arka Uç)
 * **Python 3.x:** Ana programlama dili.
